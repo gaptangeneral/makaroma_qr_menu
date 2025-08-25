@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kategoriler - Makaroma Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'warm-brown': '#795548',
+                        'sienna': '#A0522D',
+                        'golden': '#B8860B',
+                        'goldenrod': '#DAA520',
+                        'cream': '#EDE0D1'
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #FFF8F0 0%, #FDF5EC 100%);
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(237, 224, 209, 0.5);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        .elegant-font {
+            font-family: 'Playfair Display', serif;
+        }
+        .form-control {
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            transition: all 0.2s ease;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: #B8860B;
+            box-shadow: 0 0 0 3px rgba(184, 134, 11, 0.1);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Header -->
+    <header class="bg-warm-brown text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="{% url 'menu:admin_dashboard' %}" class="elegant-font text-2xl font-bold hover:text-golden transition-colors duration-200">
+                        Makaroma Admin
+                    </a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="{% url 'menu:admin_dashboard' %}" 
+                       class="bg-golden hover:bg-goldenrod text-white px-3 py-2 rounded-lg text-sm transition-colors duration-200">
+                        <i class="fas fa-home mr-1"></i>Dashboard
+                    </a>
+                    <a href="{% url 'menu:admin_logout' %}" 
+                       class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-sm transition-colors duration-200">
+                        <i class="fas fa-sign-out-alt mr-1"></i>Çıkış
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        <!-- Breadcrumb -->
+        <nav class="mb-6">
+            <ol class="flex items-center space-x-2 text-sm text-gray-600">
+                <li><a href="{% url 'menu:admin_dashboard' %}" class="hover:text-warm-brown transition-colors duration-200">Dashboard</a></li>
+                <li><i class="fas fa-chevron-right text-gray-400"></i></li>
+                <li class="text-warm-brown font-medium">Kategoriler</li>
+            </ol>
+        </nav>
+
+        <!-- Başlık -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">
+                <i class="fas fa-folder text-warm-brown mr-3"></i>
+                Kategori Yönetimi
+            </h1>
+            <p class="text-gray-600">Menü kategorilerini ekleyin, düzenleyin ve yönetin.</p>
+        </div>
+
+        <!-- Mesajlar -->
+        {% if messages %}
+            <div class="mb-6 space-y-2">
+                {% for message in messages %}
+                    <div class="p-4 rounded-lg {% if message.tags == 'error' %}bg-red-50 text-red-700 border border-red-200{% elif message.tags == 'success' %}bg-green-50 text-green-700 border border-green-200{% else %}bg-blue-50 text-blue-700 border border-blue-200{% endif %}">
+                        <div class="flex items-center">
+                            {% if message.tags == 'error' %}
+                                <i class="fas fa-exclamation-circle mr-2"></i>
+                            {% elif message.tags == 'success' %}
+                                <i class="fas fa-check-circle mr-2"></i>
+                            {% else %}
+                                <i class="fas fa-info-circle mr-2"></i>
+                            {% endif %}
+                            {{ message }}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Yeni Kategori Ekleme Formu -->
+            <div class="card rounded-xl p-6">
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">
+                    <i class="fas fa-plus-circle text-blue-600 mr-2"></i>
+                    Yeni Kategori Ekle
+                </h2>
+                
+                <form method="post" enctype="multipart/form-data" class="space-y-4">
+                    {% csrf_token %}
+                    
+                    <!-- Kategori Adı -->
+                    <div>
+                        <label for="{{ form.name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.name.label }} <span class="text-red-500">*</span>
+                        </label>
+                        {{ form.name }}
+                        {% if form.name.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.name.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Açıklama -->
+                    <div>
+                        <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.description.label }}
+                        </label>
+                        {{ form.description }}
+                        {% if form.description.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.description.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Ana Kategori -->
+                    <div>
+                        <label for="{{ form.parent.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.parent.label }}
+                        </label>
+                        {{ form.parent }}
+                        {% if form.parent.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.parent.errors.0 }}</p>
+                        {% endif %}
+                        <p class="mt-1 text-sm text-gray-500">Alt kategori oluşturmak için ana kategori seçin</p>
+                    </div>
+
+                    <!-- Kategori Resmi -->
+                    <div>
+                        <label for="{{ form.image.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.image.label }}
+                        </label>
+                        {{ form.image }}
+                        {% if form.image.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.image.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Aktif -->
+                    <div class="flex items-center">
+                        {{ form.is_active }}
+                        <label for="{{ form.is_active.id_for_label }}" class="ml-2 text-sm text-gray-700">
+                            {{ form.is_active.label }}
+                        </label>
+                    </div>
+
+                    <!-- Submit Butonu -->
+                    <button type="submit" 
+                            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200">
+                        <i class="fas fa-save mr-2"></i>
+                        Kategori Ekle
+                    </button>
+                </form>
+            </div>
+
+            <!-- Mevcut Kategoriler -->
+            <div class="card rounded-xl p-6">
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">
+                    <i class="fas fa-list text-warm-brown mr-2"></i>
+                    Mevcut Kategoriler ({{ categories.count }})
+                </h2>
+                
+                {% if categories %}
+                    <div class="space-y-3 max-h-96 overflow-y-auto">
+                        {% for category in categories %}
+                            <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors duration-200">
+                                <div class="flex items-start justify-between">
+                                    <div class="flex-1">
+                                        <div class="flex items-center mb-2">
+                                            {% if category.image %}
+                                                <img src="{{ category.image.url }}" alt="{{ category.name }}" class="w-8 h-8 rounded-full object-cover mr-2">
+                                            {% else %}
+                                                <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center mr-2">
+                                                    <span class="text-gray-600 text-xs font-semibold">{{ category.name|slice:":1"|upper }}</span>
+                                                </div>
+                                            {% endif %}
+                                            
+                                            <h3 class="font-semibold text-gray-900">{{ category.name }}</h3>
+                                            
+                                            <!-- Durum Badge'i -->
+                                            {% if category.is_active %}
+                                                <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                    <i class="fas fa-check-circle mr-1"></i>Aktif
+                                                </span>
+                                            {% else %}
+                                                <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                                    <i class="fas fa-times-circle mr-1"></i>Pasif
+                                                </span>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        {% if category.description %}
+                                            <p class="text-sm text-gray-600 mb-2">{{ category.description|truncatewords:10 }}</p>
+                                        {% endif %}
+                                        
+                                        <div class="flex items-center text-xs text-gray-500">
+                                            {% if category.parent %}
+                                                <i class="fas fa-folder mr-1"></i>
+                                                <span>Alt kategori: {{ category.parent.name }}</span>
+                                            {% else %}
+                                                <i class="fas fa-folder-open mr-1"></i>
+                                                <span>Ana kategori</span>
+                                            {% endif %}
+                                            
+                                            <span class="mx-2">•</span>
+                                            
+                                            <i class="fas fa-utensils mr-1"></i>
+                                            <span>{{ category.menu_items.count }} yemek</span>
+                                            
+                                            <span class="mx-2">•</span>
+                                            
+                                            <span>{{ category.created_at|date:"d M Y" }}</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- İşlem Butonları -->
+                                    <div class="flex items-center space-x-2 ml-4">
+                                        <button onclick="editCategory({{ category.id }})" 
+                                                class="text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 p-1.5 rounded transition-colors duration-200"
+                                                title="Düzenle">
+                                            <i class="fas fa-edit text-sm"></i>
+                                        </button>
+                                        <button onclick="deleteCategory({{ category.id }}, '{{ category.name }}')" 
+                                                class="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 p-1.5 rounded transition-colors duration-200"
+                                                title="Sil">
+                                            <i class="fas fa-trash text-sm"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-8">
+                        <i class="fas fa-folder text-gray-400 text-4xl mb-4"></i>
+                        <p class="text-gray-600">Henüz hiç kategori yok.</p>
+                        <p class="text-gray-500 text-sm">Soldaki formu kullanarak ilk kategorinizi ekleyin.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Form submit'te loading state
+        document.querySelector('form').addEventListener('submit', function() {
+            const button = this.querySelector('button[type="submit"]');
+            button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Ekleniyor...';
+            button.disabled = true;
+        });
+
+        // Kategori düzenleme (basit alert için, daha sonra modal yapılabilir)
+        function editCategory(categoryId) {
+            alert('Kategori düzenleme özelliği yakında eklenecek. ID: ' + categoryId);
+            // TODO: Modal açılacak veya ayrı sayfa
+        }
+
+        // Kategori silme
+        function deleteCategory(categoryId, categoryName) {
+            if (confirm(`"${categoryName}" kategorisini silmek istediğinizden emin misiniz?\n\nBu kategoriye ait tüm yemekler de silinecektir!`)) {
+                // TODO: AJAX ile silme işlemi
+                alert('Kategori silme özelliği yakında eklenecek.');
+            }
+        }
+
+        // Resim preview
+        document.getElementById('{{ form.image.id_for_label }}').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    // Mevcut preview'ı kaldır
+                    const existingPreview = document.querySelector('.image-preview');
+                    if (existingPreview) {
+                        existingPreview.remove();
+                    }
+                    
+                    // Yeni preview oluştur
+                    const preview = document.createElement('div');
+                    preview.className = 'image-preview mt-2';
+                    preview.innerHTML = `
+                        <img src="${e.target.result}" alt="Preview" class="w-16 h-16 object-cover rounded-lg border border-gray-200">
+                        <p class="text-sm text-gray-500 mt-1">Önizleme</p>
+                    `;
+                    e.target.parentNode.appendChild(preview);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Mesajları otomatik gizle
+        setTimeout(function() {
+            const messages = document.querySelectorAll('[class*="bg-green-50"], [class*="bg-red-50"], [class*="bg-blue-50"]');
+            messages.forEach(message => {
+                message.style.transition = 'opacity 0.5s ease-out';
+                message.style.opacity = '0';
+                setTimeout(() => message.remove(), 500);
+            });
+        }, 5000);
+    </script>
+</body>
+</html>

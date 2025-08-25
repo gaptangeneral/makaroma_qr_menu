@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yeni Yemek Ekle - Makaroma Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'warm-brown': '#795548',
+                        'sienna': '#A0522D',
+                        'golden': '#B8860B',
+                        'goldenrod': '#DAA520',
+                        'cream': '#EDE0D1'
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #FFF8F0 0%, #FDF5EC 100%);
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(237, 224, 209, 0.5);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        .elegant-font {
+            font-family: 'Playfair Display', serif;
+        }
+        .form-control {
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            transition: all 0.2s ease;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: #B8860B;
+            box-shadow: 0 0 0 3px rgba(184, 134, 11, 0.1);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Header -->
+    <header class="bg-warm-brown text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="{% url 'menu:admin_dashboard' %}" class="elegant-font text-2xl font-bold hover:text-golden transition-colors duration-200">
+                        Makaroma Admin
+                    </a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="{% url 'menu:admin_dashboard' %}" 
+                       class="bg-golden hover:bg-goldenrod text-white px-3 py-2 rounded-lg text-sm transition-colors duration-200">
+                        <i class="fas fa-home mr-1"></i>Dashboard
+                    </a>
+                    <a href="{% url 'menu:admin_logout' %}" 
+                       class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-sm transition-colors duration-200">
+                        <i class="fas fa-sign-out-alt mr-1"></i>Çıkış
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        <!-- Breadcrumb -->
+        <nav class="mb-6">
+            <ol class="flex items-center space-x-2 text-sm text-gray-600">
+                <li><a href="{% url 'menu:admin_dashboard' %}" class="hover:text-warm-brown transition-colors duration-200">Dashboard</a></li>
+                <li><i class="fas fa-chevron-right text-gray-400"></i></li>
+                <li class="text-warm-brown font-medium">Yeni Yemek Ekle</li>
+            </ol>
+        </nav>
+
+        <!-- Başlık -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">
+                <i class="fas fa-plus-circle text-warm-brown mr-3"></i>
+                Yeni Yemek Ekle
+            </h1>
+            <p class="text-gray-600">Menüye yeni bir yemek eklemek için aşağıdaki formu doldurun.</p>
+        </div>
+
+        <!-- Form -->
+        <div class="card rounded-xl p-8">
+            <form method="post" enctype="multipart/form-data" class="space-y-6">
+                {% csrf_token %}
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Sol Kolon -->
+                    <div class="space-y-6">
+                        <!-- Yemek Adı -->
+                        <div>
+                            <label for="{{ form.name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                {{ form.name.label }} <span class="text-red-500">*</span>
+                            </label>
+                            {{ form.name }}
+                            {% if form.name.errors %}
+                                <p class="mt-1 text-sm text-red-600">{{ form.name.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Kategori -->
+                        <div>
+                            <label for="{{ form.category.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                {{ form.category.label }} <span class="text-red-500">*</span>
+                            </label>
+                            {{ form.category }}
+                            {% if form.category.errors %}
+                                <p class="mt-1 text-sm text-red-600">{{ form.category.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Fiyat ve Hazırlık Süresi -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label for="{{ form.base_price.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                    {{ form.base_price.label }} <span class="text-red-500">*</span>
+                                </label>
+                                {{ form.base_price }}
+                                {% if form.base_price.errors %}
+                                    <p class="mt-1 text-sm text-red-600">{{ form.base_price.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <label for="{{ form.preparation_time_minutes.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                    {{ form.preparation_time_minutes.label }}
+                                </label>
+                                {{ form.preparation_time_minutes }}
+                                {% if form.preparation_time_minutes.errors %}
+                                    <p class="mt-1 text-sm text-red-600">{{ form.preparation_time_minutes.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Yemek Resmi -->
+                        <div>
+                            <label for="{{ form.image.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                {{ form.image.label }}
+                            </label>
+                            {{ form.image }}
+                            {% if form.image.errors %}
+                                <p class="mt-1 text-sm text-red-600">{{ form.image.errors.0 }}</p>
+                            {% endif %}
+                            <p class="mt-1 text-sm text-gray-500">Önerilen boyut: 800x450px (16:9 oran)</p>
+                        </div>
+                    </div>
+
+                    <!-- Sağ Kolon -->
+                    <div class="space-y-6">
+                        <!-- Açıklama -->
+                        <div>
+                            <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                {{ form.description.label }} <span class="text-red-500">*</span>
+                            </label>
+                            {{ form.description }}
+                            {% if form.description.errors %}
+                                <p class="mt-1 text-sm text-red-600">{{ form.description.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Özellikler -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-3">Yemek Özellikleri</label>
+                            <div class="space-y-3">
+                                <label class="flex items-center">
+                                    {{ form.is_available }}
+                                    <span class="ml-2 text-sm text-gray-700">{{ form.is_available.label }}</span>
+                                </label>
+                                <label class="flex items-center">
+                                    {{ form.is_chef_recommendation }}
+                                    <span class="ml-2 text-sm text-gray-700">{{ form.is_chef_recommendation.label }}</span>
+                                </label>
+                                <label class="flex items-center">
+                                    {{ form.is_popular }}
+                                    <span class="ml-2 text-sm text-gray-700">{{ form.is_popular.label }}</span>
+                                </label>
+                                <label class="flex items-center">
+                                    {{ form.is_vegetarian }}
+                                    <span class="ml-2 text-sm text-gray-700">{{ form.is_vegetarian.label }}</span>
+                                </label>
+                                <label class="flex items-center">
+                                    {{ form.is_vegan }}
+                                    <span class="ml-2 text-sm text-gray-700">{{ form.is_vegan.label }}</span>
+                                </label>
+                                <label class="flex items-center">
+                                    {{ form.is_gluten_free }}
+                                    <span class="ml-2 text-sm text-gray-700">{{ form.is_gluten_free.label }}</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mevcut Eklentiler -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-3">{{ form.available_extras.label }}</label>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-40 overflow-y-auto border border-gray-200 rounded-lg p-4">
+                        {% for choice in form.available_extras %}
+                            <label class="flex items-center p-2 rounded hover:bg-gray-50">
+                                {{ choice.tag }}
+                                <span class="ml-2 text-sm text-gray-700">{{ choice.choice_label }}</span>
+                            </label>
+                        {% endfor %}
+                    </div>
+                    {% if form.available_extras.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.available_extras.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Form Butonları -->
+                <div class="flex justify-end space-x-4 pt-6 border-t border-gray-200">
+                    <a href="{% url 'menu:admin_dashboard' %}" 
+                       class="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors duration-200">
+                        <i class="fas fa-times mr-2"></i>İptal
+                    </a>
+                    <button type="submit" 
+                            class="px-6 py-3 bg-warm-brown hover:bg-sienna text-white rounded-lg transition-colors duration-200">
+                        <i class="fas fa-save mr-2"></i>Yemeği Kaydet
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Form submit'te loading state
+        document.querySelector('form').addEventListener('submit', function() {
+            const button = this.querySelector('button[type="submit"]');
+            button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Kaydediliyor...';
+            button.disabled = true;
+        });
+
+        // Resim preview
+        document.getElementById('{{ form.image.id_for_label }}').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    // Mevcut preview'ı kaldır
+                    const existingPreview = document.querySelector('.image-preview');
+                    if (existingPreview) {
+                        existingPreview.remove();
+                    }
+                    
+                    // Yeni preview oluştur
+                    const preview = document.createElement('div');
+                    preview.className = 'image-preview mt-2';
+                    preview.innerHTML = `
+                        <img src="${e.target.result}" alt="Preview" class="w-32 h-20 object-cover rounded-lg border border-gray-200">
+                        <p class="text-sm text-gray-500 mt-1">Önizleme</p>
+                    `;
+                    e.target.parentNode.appendChild(preview);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+</body>
+</html>

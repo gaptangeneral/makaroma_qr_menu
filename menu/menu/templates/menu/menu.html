@@ -1,0 +1,411 @@
+{% load static %}
+
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ sayfa_basligi }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'warm-brown': '#795548',
+                        'sienna': '#A0522D',
+                        'golden': '#B8860B',
+                        'goldenrod': '#DAA520',
+                        'cream': '#EDE0D1'
+                    },
+                    fontFamily: {
+                        'serif': ['Georgia', 'serif'],
+                        'elegant': ['Playfair Display', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #FFF8F0 0%, #FDF5EC 100%);
+            color: #4A4A4A;
+        }
+        .elegant-font {
+            font-family: 'Playfair Display', serif;
+        }
+        .glass-effect {
+            backdrop-filter: blur(12px);
+            background: rgba(255, 255, 255, 0.85);
+            border: 1px solid rgba(237, 224, 209, 0.5);
+        }
+        .hover-lift {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .hover-lift:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+        }
+        .category-card {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(255, 248, 240, 0.8));
+            border: 1px solid rgba(211, 139, 38, 0.2);
+        }
+        .dish-item {
+            background: rgba(255, 255, 255, 0.7);
+            border-left: 4px solid transparent;
+            transition: all 0.3s ease;
+        }
+        .dish-item:hover {
+            background: rgba(255, 248, 240, 0.95);
+            border-left-color: #DAA520;
+            transform: translateX(5px);
+            box-shadow: 0 4px 15px rgba(218, 165, 32, 0.1);
+        }
+        .price-tag {
+            background: linear-gradient(135deg, #D35400, #E67E22);
+            color: white;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+        }
+        .floating-nav {
+            position: sticky;
+            top: 20px;
+            z-index: 50;
+        }
+        .category-section {
+            scroll-margin-top: 120px; 
+        }
+        .nav-item.active { 
+            background-color: #795548; 
+            color: white;
+        }
+        .nav-item.active i {
+            color: white;
+        }
+        .extras-list {
+            display: inline-flex;
+            flex-wrap: wrap;
+            gap: 0.25rem;
+            align-items: center;
+        }
+        .extra-tag {
+            background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+            border: 1px solid #d1d5db;
+            padding: 0.125rem 0.5rem;
+            border-radius: 0.375rem;
+            font-size: 0.75rem;
+            color: #374151;
+            font-weight: 500;
+        }
+
+        /* Header Video Stilleri */
+        .header-video-container {
+            position: relative;
+            overflow: hidden;
+            height: 45vh;
+            background-color: #333;
+        }
+        #bgVideo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            z-index: 0;
+            transform: translateX(-50%) translateY(-50%);
+            object-fit: cover;
+        }
+        .header-video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(40, 25, 15, 0.4);
+            z-index: 1;
+        }
+        .header-content {
+            position: relative;
+            z-index: 2;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        @media (max-width: 768px) {
+            .floating-nav {
+                position: fixed;
+                bottom: 15px;
+                top: auto;
+                left: 50%;
+                transform: translateX(-50%);
+                width: calc(100% - 30px);
+                max-width: 400px;
+            }
+            .floating-nav > div {
+                justify-content: center;
+            }
+            .floating-nav #categoryNav {
+                overflow-x: auto; 
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+                -ms-overflow-style: none;  
+            }
+            .floating-nav #categoryNav::-webkit-scrollbar { 
+                display: none;
+            }
+            .category-section {
+                scroll-margin-top: 20px;
+            }
+            .header-video-container {
+                 height: 50vh;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Header with Video Background -->
+    <header class="header-video-container text-center flex flex-col justify-center items-center">
+        <video autoplay muted loop playsinline id="bgVideo">
+            <source src="{% static 'media/videonuz.mp4' %}" type="video/mp4">
+            Tarayıcınız video etiketini desteklemiyor.
+        </video>
+        <div class="header-video-overlay"></div>
+        <div class="header-content max-w-4xl mx-auto px-4 text-white"> 
+            <h1 class="elegant-font text-4xl md:text-6xl font-bold mb-2">
+                Makaroma
+            </h1>
+            <div class="w-24 h-1 bg-golden mx-auto mb-4 opacity-80"></div>
+            <p class="text-lg md:text-xl font-light opacity-90">
+                Lezzetin Adresi
+            </p>
+        </div>
+    </header>
+
+    <!-- Floating Navigation -->
+    <nav class="floating-nav mt-[-40px]"> 
+        <div class="flex justify-center">
+            <div class="glass-effect rounded-full px-4 py-2 sm:px-6 sm:py-3 shadow-xl">
+                <div class="flex space-x-3 sm:space-x-4" id="categoryNav">
+                    {% if menu_icerigi %}
+                        {% for kategori_data in menu_icerigi %}
+                            <a href="#kategori-{{ kategori_data.kategori_slug }}" 
+                               class="nav-item flex items-center px-3 py-2 rounded-full text-xs sm:text-sm font-medium text-warm-brown hover:bg-warm-brown hover:text-white transition-all duration-300 whitespace-nowrap">
+                                {% if kategori_data.kategori_adi == "Mezeler" %} <i class="fas fa-utensils mr-1 sm:mr-2"></i>
+                                {% elif kategori_data.kategori_adi == "Makarnalar" %} <i class="fas fa-bowl-food mr-1 sm:mr-2"></i>
+                                {% elif kategori_data.kategori_adi == "Ana Yemekler" %} <i class="fas fa-drumstick-bite mr-1 sm:mr-2"></i>
+                                {% elif kategori_data.kategori_adi == "Tatlılar" %} <i class="fas fa-ice-cream mr-1 sm:mr-2"></i>
+                                {% elif kategori_data.kategori_adi == "İçecekler" %} <i class="fas fa-wine-glass mr-1 sm:mr-2"></i>
+                                {% else %} <i class="fas fa-circle-notch mr-1 sm:mr-2"></i> {% endif %}
+                                <span class="hidden sm:inline">{{ kategori_data.kategori_adi }}</span>
+                                <span class="sm:hidden">{{ kategori_data.kategori_adi|slice:":3" }}</span>
+                            </a>
+                        {% endfor %}
+                    {% else %}
+                        <span class="text-sm text-gray-500">Kategori bulunamadı.</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Menu Content -->
+    <main class="max-w-6xl mx-auto px-4 pb-20 pt-8">
+        <div id="menuContainer">
+            {% if menu_icerigi %}
+                {% for kategori_data in menu_icerigi %}
+                    <section class="category-section mb-12" id="kategori-{{ kategori_data.kategori_slug }}">
+                        <div class="category-card rounded-2xl p-6 md:p-8 shadow-xl hover-lift">
+                            <div class="flex items-center mb-6">
+                                <div class="w-12 h-12 bg-warm-brown rounded-full flex items-center justify-center mr-4 text-cream text-xl">
+                                    {% if kategori_data.kategori_resmi_url %}
+                                        <img src="{{ kategori_data.kategori_resmi_url }}" alt="{{ kategori_data.kategori_adi }}" class="w-full h-full rounded-full object-cover"
+                                             onerror="this.outerHTML='{% if kategori_data.kategori_adi == "Mezeler" %}<i class=\\'fas fa-utensils\\'></i>{% elif kategori_data.kategori_adi == "Makarnalar" %}<i class=\\'fas fa-bowl-food\\'></i>{% elif kategori_data.kategori_adi == "Ana Yemekler" %}<i class=\\'fas fa-drumstick-bite\\'></i>{% elif kategori_data.kategori_adi == "Tatlılar" %}<i class=\\'fas fa-ice-cream\\'></i>{% elif kategori_data.kategori_adi == "İçecekler" %}<i class=\\'fas fa-wine-glass\\'></i>{% else %}<span class=\\'font-bold\\'>{{ kategori_data.kategori_adi|slice:":1"|upper }}</span>{% endif %}'">
+                                    {% else %}
+                                        {% if kategori_data.kategori_adi == "Mezeler" %} <i class="fas fa-utensils"></i>
+                                        {% elif kategori_data.kategori_adi == "Makarnalar" %} <i class="fas fa-bowl-food"></i>
+                                        {% elif kategori_data.kategori_adi == "Ana Yemekler" %} <i class="fas fa-drumstick-bite"></i>
+                                        {% elif kategori_data.kategori_adi == "Tatlılar" %} <i class="fas fa-ice-cream"></i>
+                                        {% elif kategori_data.kategori_adi == "İçecekler" %} <i class="fas fa-wine-glass"></i>
+                                        {% else %} <span class="font-bold">{{ kategori_data.kategori_adi|slice:":1"|upper }}</span> {% endif %}
+                                    {% endif %}
+                                </div>
+                                <h2 class="elegant-font text-3xl md:text-4xl font-bold text-warm-brown">
+                                    {{ kategori_data.kategori_adi }}
+                                </h2>
+                            </div>
+                            
+                            {% if kategori_data.kategori_aciklamasi %}
+                            <p class="text-gray-600 text-sm md:text-base leading-relaxed mb-6">{{ kategori_data.kategori_aciklamasi }}</p>
+                            {% endif %}
+                            
+                            {% if kategori_data.urunler %}
+                                <div class="grid gap-4 md:gap-6">
+                                    {% for urun in kategori_data.urunler %}
+                                        <div class="dish-item rounded-xl p-4 md:p-6">
+                                            <div class="flex items-start gap-4">
+                                                <div class="w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0">
+                                                    {% if urun.image %}
+                                                        <img src="{{ urun.image.url }}" alt="{{ urun.name }}" 
+                                                             class="w-full h-full object-cover rounded-md shadow-sm"
+                                                             onerror="this.onerror=null; this.src='https://placehold.co/100/FFDFB9/D35400?text={{ urun.name|slice:":1"|upper }}';">
+                                                    {% else %}
+                                                        <div class="w-full h-full bg-orange-200 rounded-md flex items-center justify-center text-orange-600 font-semibold text-lg">
+                                                            {{ urun.name|slice:":1"|upper }}
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                                <div class="flex-grow flex flex-col sm:flex-row justify-between items-start">
+                                                    <div class="flex-1 mb-2 sm:mb-0 sm:pr-3">
+                                                        <div class="flex items-start justify-between mb-1">
+                                                            <h3 class="font-semibold text-lg md:text-xl text-warm-brown">
+                                                                {{ urun.name }}
+                                                            </h3>
+                                                            <span class="price-tag px-3 py-1 rounded-full text-sm md:text-base font-semibold whitespace-nowrap ml-2">
+                                                                ₺{{ urun.base_price|floatformat:2 }}
+                                                            </span>
+                                                        </div>
+                                                        
+                                                        <!-- Etiketler -->
+                                                        <div class="flex flex-wrap gap-1 mb-2">
+                                                            {% if urun.is_chef_recommendation %}
+                                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-red-600 text-white shadow-sm">
+                                                                    <i class="fas fa-star mr-1"></i>Şef Önerisi
+                                                                </span>
+                                                            {% endif %}
+                                                            {% if urun.is_popular %}
+                                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-yellow-500 text-gray-800 shadow-sm">
+                                                                    <i class="fas fa-fire-alt mr-1"></i>Popüler
+                                                                </span>
+                                                            {% endif %}
+                                                            {% if urun.is_vegetarian %}
+                                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-green-600 text-white shadow-sm">
+                                                                    <i class="fas fa-leaf mr-1"></i>Vejetaryen
+                                                                </span>
+                                                            {% endif %}
+                                                            {% if urun.is_vegan %}
+                                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-green-700 text-white shadow-sm">
+                                                                    <i class="fas fa-seedling mr-1"></i>Vegan
+                                                                </span>
+                                                            {% endif %}
+                                                            {% if urun.is_gluten_free %}
+                                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-blue-600 text-white shadow-sm">
+                                                                    <i class="fas fa-wheat mr-1"></i>Glutensiz
+                                                                </span>
+                                                            {% endif %}
+                                                        </div>
+                                                        
+                                                        <p class="text-gray-600 text-sm md:text-base leading-relaxed mb-2">
+                                                            {{ urun.description }}
+                                                        </p>
+                                                        
+                                                        <!-- Ek Lezzetler -->
+                                                        {% if urun.available_extras.all %}
+                                                        <div class="mt-2">
+                                                            <span class="text-sm font-medium text-gray-700 mr-2">Ek seçenekler:</span>
+                                                            <div class="extras-list mt-1">
+                                                                {% for extra in urun.available_extras.all %}
+                                                                    {% if extra.is_available %}
+                                                                    <span class="extra-tag">
+                                                                        {{ extra.name }} (+₺{{ extra.price|floatformat:0 }})
+                                                                    </span>
+                                                                    {% endif %}
+                                                                {% endfor %}
+                                                            </div>
+                                                        </div>
+                                                        {% endif %}
+                                                        
+                                                        <!-- Rating ve Hazırlık Süresi -->
+                                                        <div class="flex items-center text-sm text-gray-500 mt-2">
+                                                            {% if urun.average_rating > 0 %}
+                                                                <i class="fas fa-star text-yellow-400 mr-1"></i>
+                                                                <span class="font-semibold mr-2">{{ urun.average_rating|floatformat:1 }} ({{ urun.total_reviews }})</span>
+                                                            {% endif %}
+                                                            {% if urun.preparation_time_minutes %}
+                                                                <i class="fas fa-clock text-gray-400 mr-1"></i>
+                                                                <span>{{ urun.get_preparation_time_display }}</span>
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <p class="text-center text-gray-500 py-4">Bu kategoride henüz ürün bulunmamaktadır.</p>
+                            {% endif %}
+                        </div>
+                    </section>
+                {% endfor %}
+            {% else %}
+                <p class="text-center text-2xl text-gray-500 py-12">Menümüzde gösterilecek herhangi bir kategori veya ürün bulunamadı.</p>
+            {% endif %}
+        </div>
+    </main>
+
+    <footer class="text-center py-8 mt-12">
+        <div class="max-w-4xl mx-auto px-4">
+            <div class="w-16 h-0.5 bg-golden mx-auto mb-4"></div>
+            <p class="text-warm-brown text-sm">
+                © {% now "Y" %} Makaroma - Tüm hakları saklıdır
+            </p>
+        </div>
+    </footer>
+
+    <script>
+    // Sayfa Yüklendiğinde Çalışacaklar
+    document.addEventListener('DOMContentLoaded', function() {
+        const navItems = document.querySelectorAll('#categoryNav a.nav-item');
+        navItems.forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        const categorySections = document.querySelectorAll('.category-section');
+        if (categorySections.length > 0) {
+            const observerOptions = { threshold: 0.1, rootMargin: '-100px 0px -40% 0px' };
+            const observer = new IntersectionObserver((entries) => {
+                let lastVisibleSectionId = null;
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) lastVisibleSectionId = entry.target.id;
+                });
+                navItems.forEach(navItem => {
+                    navItem.classList.remove('active', 'bg-warm-brown', 'text-white');
+                    navItem.classList.add('text-warm-brown');
+                    if (navItem.getAttribute('href') === `#${lastVisibleSectionId}`) {
+                        navItem.classList.add('active', 'bg-warm-brown', 'text-white');
+                        navItem.classList.remove('text-warm-brown');
+                    }
+                });
+            }, observerOptions);
+            categorySections.forEach(section => observer.observe(section));
+        }
+
+        const animateOnScrollObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                    animateOnScrollObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+        
+        document.querySelectorAll('.category-card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(30px)';
+            card.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
+            animateOnScrollObserver.observe(card);
+        });
+    });
+    </script>
+</body>
+</html>

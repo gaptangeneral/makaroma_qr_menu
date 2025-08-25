@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Makaroma</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'warm-brown': '#795548',
+                        'sienna': '#A0522D',
+                        'golden': '#B8860B',
+                        'goldenrod': '#DAA520',
+                        'cream': '#EDE0D1'
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #FFF8F0 0%, #FDF5EC 100%);
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(237, 224, 209, 0.5);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        .elegant-font {
+            font-family: 'Playfair Display', serif;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Header -->
+    <header class="bg-warm-brown text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <h1 class="elegant-font text-2xl font-bold">Makaroma Admin</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span class="text-sm">Hoş geldin, {{ user.first_name|default:user.username }}</span>
+                    <a href="{% url 'menu:tek_sayfa_menu' %}" 
+                       class="bg-golden hover:bg-goldenrod text-white px-3 py-2 rounded-lg text-sm transition-colors duration-200">
+                        <i class="fas fa-eye mr-1"></i>Siteyi Görüntüle
+                    </a>
+                    <a href="{% url 'menu:admin_logout' %}" 
+                       class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-sm transition-colors duration-200">
+                        <i class="fas fa-sign-out-alt mr-1"></i>Çıkış
+                    </a>
+                </div>
+            </div>
+            
+            <div class="card rounded-xl p-6">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center text-white text-xl">
+                        <i class="fas fa-utensils"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Toplam Yemek</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ total_items }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card rounded-xl p-6">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center text-white text-xl">
+                        <i class="fas fa-plus-circle"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Toplam Eklenti</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ total_extras }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hızlı Erişim Butonları -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <a href="{% url 'menu:admin_add_item' %}" 
+               class="card rounded-xl p-6 text-center hover:bg-warm-brown hover:text-white transition-all duration-300 group">
+                <div class="w-16 h-16 bg-warm-brown group-hover:bg-white rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-plus text-white group-hover:text-warm-brown text-2xl"></i>
+                </div>
+                <h3 class="font-semibold text-lg mb-2">Yeni Yemek Ekle</h3>
+                <p class="text-sm text-gray-600 group-hover:text-white">Menüye yeni yemek ekle</p>
+            </a>
+
+            <a href="{% url 'menu:admin_manage_items' %}" 
+               class="card rounded-xl p-6 text-center hover:bg-golden hover:text-white transition-all duration-300 group">
+                <div class="w-16 h-16 bg-golden group-hover:bg-white rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-edit text-white group-hover:text-golden text-2xl"></i>
+                </div>
+                <h3 class="font-semibold text-lg mb-2">Yemekleri Yönet</h3>
+                <p class="text-sm text-gray-600 group-hover:text-white">Mevcut yemekleri düzenle</p>
+            </a>
+
+            <a href="{% url 'menu:admin_manage_categories' %}" 
+               class="card rounded-xl p-6 text-center hover:bg-blue-600 hover:text-white transition-all duration-300 group">
+                <div class="w-16 h-16 bg-blue-600 group-hover:bg-white rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-folder text-white group-hover:text-blue-600 text-2xl"></i>
+                </div>
+                <h3 class="font-semibold text-lg mb-2">Kategoriler</h3>
+                <p class="text-sm text-gray-600 group-hover:text-white">Kategori ekle ve düzenle</p>
+            </a>
+
+            <a href="{% url 'menu:admin_manage_extras' %}" 
+               class="card rounded-xl p-6 text-center hover:bg-purple-600 hover:text-white transition-all duration-300 group">
+                <div class="w-16 h-16 bg-purple-600 group-hover:bg-white rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-puzzle-piece text-white group-hover:text-purple-600 text-2xl"></i>
+                </div>
+                <h3 class="font-semibold text-lg mb-2">Eklentiler</h3>
+                <p class="text-sm text-gray-600 group-hover:text-white">Yemek eklentilerini yönet</p>
+            </a>
+        </div>
+
+        <!-- Son Eklenen Yemekler -->
+        <div class="card rounded-xl p-6">
+            <h3 class="text-xl font-bold text-gray-900 mb-4">
+                <i class="fas fa-history mr-2 text-warm-brown"></i>
+                Son Eklenen Yemekler
+            </h3>
+            
+            {% if recent_items %}
+                <div class="overflow-x-auto">
+                    <table class="min-w-full">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Yemek</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kategori</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fiyat</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Durum</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tarih</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            {% for item in recent_items %}
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        {% if item.image %}
+                                            <img src="{{ item.image.url }}" alt="{{ item.name }}" class="w-10 h-10 rounded-full object-cover mr-3">
+                                        {% else %}
+                                            <div class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center mr-3">
+                                                <span class="text-gray-600 font-semibold">{{ item.name|slice:":1"|upper }}</span>
+                                            </div>
+                                        {% endif %}
+                                        <div>
+                                            <div class="text-sm font-medium text-gray-900">{{ item.name }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ item.category.name }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₺{{ item.base_price }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    {% if item.is_available %}
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                            <i class="fas fa-check-circle mr-1"></i>Aktif
+                                        </span>
+                                    {% else %}
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                            <i class="fas fa-times-circle mr-1"></i>Pasif
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ item.created_at|date:"d M Y, H:i" }}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="mt-4 text-center">
+                    <a href="{% url 'menu:admin_manage_items' %}" 
+                       class="inline-flex items-center px-4 py-2 border border-warm-brown text-sm font-medium rounded-lg text-warm-brown bg-white hover:bg-warm-brown hover:text-white transition-colors duration-200">
+                        <i class="fas fa-list mr-2"></i>
+                        Tüm Yemekleri Görüntüle
+                    </a>
+                </div>
+            {% else %}
+                <div class="text-center py-8">
+                    <i class="fas fa-utensils text-gray-400 text-4xl mb-4"></i>
+                    <p class="text-gray-600">Henüz hiç yemek eklenmemiş.</p>
+                    <a href="{% url 'menu:admin_add_item' %}" 
+                       class="mt-4 inline-flex items-center px-4 py-2 bg-warm-brown text-white rounded-lg hover:bg-sienna transition-colors duration-200">
+                        <i class="fas fa-plus mr-2"></i>
+                        İlk Yemeği Ekle
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        // Kartlar için hover animasyonları
+        document.querySelectorAll('.card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-4px)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+
+        // Mesajları otomatik gizle
+        setTimeout(function() {
+            const messages = document.querySelectorAll('[class*="bg-green-50"], [class*="bg-red-50"], [class*="bg-blue-50"]');
+            messages.forEach(message => {
+                message.style.transition = 'opacity 0.5s ease-out';
+                message.style.opacity = '0';
+                setTimeout(() => message.remove(), 500);
+            });
+        }, 5000);
+    </script>
+</body>
+</html>
+    </header>
+
+    <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        <!-- Mesajlar -->
+        {% if messages %}
+            <div class="mb-6 space-y-2">
+                {% for message in messages %}
+                    <div class="p-4 rounded-lg {% if message.tags == 'error' %}bg-red-50 text-red-700 border border-red-200{% elif message.tags == 'success' %}bg-green-50 text-green-700 border border-green-200{% else %}bg-blue-50 text-blue-700 border border-blue-200{% endif %}">
+                        <div class="flex items-center">
+                            {% if message.tags == 'error' %}
+                                <i class="fas fa-exclamation-circle mr-2"></i>
+                            {% elif message.tags == 'success' %}
+                                <i class="fas fa-check-circle mr-2"></i>
+                            {% else %}
+                                <i class="fas fa-info-circle mr-2"></i>
+                            {% endif %}
+                            {{ message }}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- İstatistik Kartları -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="card rounded-xl p-6">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center text-white text-xl">
+                        <i class="fas fa-list"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Toplam Kategori</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ total_categories }}</p>
+                    </div>
+                </div>

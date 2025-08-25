@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eklentiler - Makaroma Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'warm-brown': '#795548',
+                        'sienna': '#A0522D',
+                        'golden': '#B8860B',
+                        'goldenrod': '#DAA520',
+                        'cream': '#EDE0D1'
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #FFF8F0 0%, #FDF5EC 100%);
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(237, 224, 209, 0.5);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        .elegant-font {
+            font-family: 'Playfair Display', serif;
+        }
+        .form-control {
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            transition: all 0.2s ease;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: #B8860B;
+            box-shadow: 0 0 0 3px rgba(184, 134, 11, 0.1);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Header -->
+    <header class="bg-warm-brown text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="{% url 'menu:admin_dashboard' %}" class="elegant-font text-2xl font-bold hover:text-golden transition-colors duration-200">
+                        Makaroma Admin
+                    </a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="{% url 'menu:admin_dashboard' %}" 
+                       class="bg-golden hover:bg-goldenrod text-white px-3 py-2 rounded-lg text-sm transition-colors duration-200">
+                        <i class="fas fa-home mr-1"></i>Dashboard
+                    </a>
+                    <a href="{% url 'menu:admin_logout' %}" 
+                       class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-sm transition-colors duration-200">
+                        <i class="fas fa-sign-out-alt mr-1"></i>Çıkış
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        <!-- Breadcrumb -->
+        <nav class="mb-6">
+            <ol class="flex items-center space-x-2 text-sm text-gray-600">
+                <li><a href="{% url 'menu:admin_dashboard' %}" class="hover:text-warm-brown transition-colors duration-200">Dashboard</a></li>
+                <li><i class="fas fa-chevron-right text-gray-400"></i></li>
+                <li class="text-warm-brown font-medium">Eklentiler</li>
+            </ol>
+        </nav>
+
+        <!-- Başlık -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">
+                <i class="fas fa-puzzle-piece text-warm-brown mr-3"></i>
+                Eklenti Yönetimi
+            </h1>
+            <p class="text-gray-600">Yemeklere eklenebilecek ek malzemeleri yönetin.</p>
+        </div>
+
+        <!-- Mesajlar -->
+        {% if messages %}
+            <div class="mb-6 space-y-2">
+                {% for message in messages %}
+                    <div class="p-4 rounded-lg {% if message.tags == 'error' %}bg-red-50 text-red-700 border border-red-200{% elif message.tags == 'success' %}bg-green-50 text-green-700 border border-green-200{% else %}bg-blue-50 text-blue-700 border border-blue-200{% endif %}">
+                        <div class="flex items-center">
+                            {% if message.tags == 'error' %}
+                                <i class="fas fa-exclamation-circle mr-2"></i>
+                            {% elif message.tags == 'success' %}
+                                <i class="fas fa-check-circle mr-2"></i>
+                            {% else %}
+                                <i class="fas fa-info-circle mr-2"></i>
+                            {% endif %}
+                            {{ message }}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Yeni Eklenti Ekleme Formu -->
+            <div class="card rounded-xl p-6">
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">
+                    <i class="fas fa-plus-circle text-purple-600 mr-2"></i>
+                    Yeni Eklenti Ekle
+                </h2>
+                
+                <form method="post" class="space-y-4">
+                    {% csrf_token %}
+                    
+                    <!-- Eklenti Adı -->
+                    <div>
+                        <label for="{{ form.name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.name.label }} <span class="text-red-500">*</span>
+                        </label>
+                        {{ form.name }}
+                        {% if form.name.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.name.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Fiyat ve Kategori -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="{{ form.price.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                {{ form.price.label }} <span class="text-red-500">*</span>
+                            </label>
+                            {{ form.price }}
+                            {% if form.price.errors %}
+                                <p class="mt-1 text-sm text-red-600">{{ form.price.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        
+                        <div>
+                            <label for="{{ form.category.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                {{ form.category.label }} <span class="text-red-500">*</span>
+                            </label>
+                            {{ form.category }}
+                            {% if form.category.errors %}
+                                <p class="mt-1 text-sm text-red-600">{{ form.category.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Açıklama -->
+                    <div>
+                        <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.description.label }}
+                        </label>
+                        {{ form.description }}
+                        {% if form.description.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.description.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Mevcut -->
+                    <div class="flex items-center">
+                        {{ form.is_available }}
+                        <label for="{{ form.is_available.id_for_label }}" class="ml-2 text-sm text-gray-700">
+                            {{ form.is_available.label }}
+                        </label>
+                    </div>
+
+                    <!-- Submit Butonu -->
+                    <button type="submit" 
+                            class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200">
+                        <i class="fas fa-save mr-2"></i>
+                        Eklenti Ekle
+                    </button>
+                </form>
+            </div>
+
+            <!-- Mevcut Eklentiler -->
+            <div class="card rounded-xl p-6">
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">
+                    <i class="fas fa-list text-warm-brown mr-2"></i>
+                    Mevcut Eklentiler ({{ extras.count }})
+                </h2>
+                
+                <!-- Kategori Filtreleri -->
+                <div class="mb-4">
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="filterByCategory('all')" 
+                                class="filter-btn px-3 py-1 rounded-full text-sm border border-gray-300 hover:bg-gray-100 transition-colors duration-200 bg-warm-brown text-white">
+                            Tümü
+                        </button>
+                        <button onclick="filterByCategory('protein')" 
+                                class="filter-btn px-3 py-1 rounded-full text-sm border border-gray-300 hover:bg-gray-100 transition-colors duration-200">
+                            Protein
+                        </button>
+                        <button onclick="filterByCategory('sauce')" 
+                                class="filter-btn px-3 py-1 rounded-full text-sm border border-gray-300 hover:bg-gray-100 transition-colors duration-200">
+                            Sos
+                        </button>
+                        <button onclick="filterByCategory('veggie')" 
+                                class="filter-btn px-3 py-1 rounded-full text-sm border border-gray-300 hover:bg-gray-100 transition-colors duration-200">
+                            Sebze
+                        </button>
+                        <button onclick="filterByCategory('cheese')" 
+                                class="filter-btn px-3 py-1 rounded-full text-sm border border-gray-300 hover:bg-gray-100 transition-colors duration-200">
+                            Peynir
+                        </button>
+                        <button onclick="filterByCategory('other')" 
+                                class="filter-btn px-3 py-1 rounded-full text-sm border border-gray-300 hover:bg-gray-100 transition-colors duration-200">
+                            Diğer
+                        </button>
+                    </div>
+                </div>
+                
+                {% if extras %}
+                    <div class="space-y-3 max-h-80 overflow-y-auto" id="extrasContainer">
+                        {% for extra in extras %}
+                            <div class="extra-item border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors duration-200" 
+                                 data-category="{{ extra.category }}">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex-1">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <h3 class="font-semibold text-gray-900">{{ extra.name }}</h3>
+                                            <div class="flex items-center space-x-2">
+                                                <!-- Kategori Badge -->
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium 
+                                                    {% if extra.category == 'protein' %}bg-red-100 text-red-800
+                                                    {% elif extra.category == 'sauce' %}bg-yellow-100 text-yellow-800
+                                                    {% elif extra.category == 'veggie' %}bg-green-100 text-green-800
+                                                    {% elif extra.category == 'cheese' %}bg-orange-100 text-orange-800
+                                                    {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                                    {% if extra.category == 'protein' %}<i class="fas fa-drumstick-bite mr-1"></i>Protein
+                                                    {% elif extra.category == 'sauce' %}<i class="fas fa-tint mr-1"></i>Sos
+                                                    {% elif extra.category == 'veggie' %}<i class="fas fa-carrot mr-1"></i>Sebze
+                                                    {% elif extra.category == 'cheese' %}<i class="fas fa-cheese mr-1"></i>Peynir
+                                                    {% else %}<i class="fas fa-circle mr-1"></i>{{ extra.get_category_display }}{% endif %}
+                                                </span>
+                                                
+                                                <!-- Durum Badge -->
+                                                {% if extra.is_available %}
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                        <i class="fas fa-check-circle mr-1"></i>Mevcut
+                                                    </span>
+                                                {% else %}
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                                        <i class="fas fa-times-circle mr-1"></i>Yok
+                                                    </span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="flex items-center justify-between">
+                                            <div>
+                                                <p class="text-lg font-bold text-warm-brown">+₺{{ extra.price|floatformat:2 }}</p>
+                                                {% if extra.description %}
+                                                    <p class="text-sm text-gray-600 mt-1">{{ extra.description|truncatewords:8 }}</p>
+                                                {% endif %}
+                                            </div>
+                                            
+                                            <!-- İşlem Butonları -->
+                                            <div class="flex items-center space-x-2">
+                                                <button onclick="editExtra({{ extra.id }})" 
+                                                        class="text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 p-1.5 rounded transition-colors duration-200"
+                                                        title="Düzenle">
+                                                    <i class="fas fa-edit text-sm"></i>
+                                                </button>
+                                                <button onclick="deleteExtra({{ extra.id }}, '{{ extra.name }}')" 
+                                                        class="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 p-1.5 rounded transition-colors duration-200"
+                                                        title="Sil">
+                                                    <i class="fas fa-trash text-sm"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="mt-4 pt-4 border-t border-gray-200">
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center text-sm">
+                            <div>
+                                <span class="block text-2xl font-bold text-red-600">{{ extras|length|add:0 }}</span>
+                                <span class="text-gray-600">Toplam</span>
+                            </div>
+                            <div>
+                                <span class="block text-2xl font-bold text-green-600" id="availableCount">0</span>
+                                <span class="text-gray-600">Mevcut</span>
+                            </div>
+                            <div>
+                                <span class="block text-2xl font-bold text-orange-600" id="unavailableCount">0</span>
+                                <span class="text-gray-600">Yok</span>
+                            </div>
+                            <div>
+                                <span class="block text-2xl font-bold text-blue-600" id="totalValue">₺0</span>
+                                <span class="text-gray-600">Ortalama Fiyat</span>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="text-center py-8">
+                        <i class="fas fa-puzzle-piece text-gray-400 text-4xl mb-4"></i>
+                        <p class="text-gray-600">Henüz hiç eklenti yok.</p>
+                        <p class="text-gray-500 text-sm">Soldaki formu kullanarak ilk eklentinizi ekleyin.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Form submit'te loading state
+        document.querySelector('form').addEventListener('submit', function() {
+            const button = this.querySelector('button[type="submit"]');
+            button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Ekleniyor...';
+            button.disabled = true;
+        });
+
+        // Sayfa yüklendiğinde istatistikleri hesapla
+        document.addEventListener('DOMContentLoaded', function() {
+            calculateStats();
+        });
+
+        // İstatistikleri hesapla
+        function calculateStats() {
+            const extraItems = document.querySelectorAll('.extra-item');
+            let availableCount = 0;
+            let unavailableCount = 0;
+            let totalPrice = 0;
+
+            extraItems.forEach(item => {
+                const isAvailable = item.querySelector('.bg-green-100');
+                const priceText = item.querySelector('.text-warm-brown').textContent;
+                const price = parseFloat(priceText.replace(/[₺+]/g, '')) || 0;
+                
+                totalPrice += price;
+                
+                if (isAvailable) {
+                    availableCount++;
+                } else {
+                    unavailableCount++;
+                }
+            });
+
+            const averagePrice = extraItems.length > 0 ? totalPrice / extraItems.length : 0;
+
+            // DOM'u güncelle
+            document.getElementById('availableCount').textContent = availableCount;
+            document.getElementById('unavailableCount').textContent = unavailableCount;
+            document.getElementById('totalValue').textContent = `₺${averagePrice.toFixed(2)}`;
+        }
+
+        // Kategori filtreleme
+        function filterByCategory(category) {
+            const items = document.querySelectorAll('.extra-item');
+            const buttons = document.querySelectorAll('.filter-btn');
+            
+            // Buton stillerini güncelle
+            buttons.forEach(btn => {
+                btn.classList.remove('bg-warm-brown', 'text-white');
+                btn.classList.add('border-gray-300', 'hover:bg-gray-100');
+            });
+            
+            event.target.classList.add('bg-warm-brown', 'text-white');
+            event.target.classList.remove('border-gray-300', 'hover:bg-gray-100');
+            
+            // Öğeleri filtrele
+            items.forEach(item => {
+                if (category === 'all' || item.dataset.category === category) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        // Eklenti düzenleme
+        function editExtra(extraId) {
+            alert('Eklenti düzenleme özelliği yakında eklenecek. ID: ' + extraId);
+            // TODO: Modal açılacak veya ayrı sayfa
+        }
+
+        // Eklenti silme
+        function deleteExtra(extraId, extraName) {
+            if (confirm(`"${extraName}" eklentisini silmek istediğinizden emin misiniz?\n\nBu eklentiyi kullanan tüm yemeklerden de kaldırılacaktır!`)) {
+                // TODO: AJAX ile silme işlemi
+                alert('Eklenti silme özelliği yakında eklenecek.');
+            }
+        }
+
+        // Mesajları otomatik gizle
+        setTimeout(function() {
+            const messages = document.querySelectorAll('[class*="bg-green-50"], [class*="bg-red-50"], [class*="bg-blue-50"]');
+            messages.forEach(message => {
+                message.style.transition = 'opacity 0.5s ease-out';
+                message.style.opacity = '0';
+                setTimeout(() => message.remove(), 500);
+            });
+        }, 5000);
+    </script>
+</body>
+</html>
